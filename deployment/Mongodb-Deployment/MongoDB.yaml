@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  namespace: db
+  name: mongodb
+spec:
+  selector:
+    matchLabels:
+      app: mongodb 
+  serviceName: "mongo-db-service"
+  replicas: 3 
+  minReadySeconds: 10 
+  template:
+    metadata:
+      labels:
+        app: mongodb
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: mongodb
+        image: mongo
+        ports:
+        - containerPort: 27017
+          name: web
+        volumeMounts:   
+        - name: mongodb-storage                  
+          mountPath: "/data/db" 
+        - name: mongodb-configmap
+          mountPath: /config
+          readOnly: true              
+        env:
+          - name: MONGO_INITDB_ROOT_PASSWORD
+            valueFrom:                            
+              secretKeyRef:
+                name: mongodb-secret
+                key: mongo-root-password
+        resources:
+          requests:
+            cpu: 100m
+            memory: 200Mi
+        livenessProbe:
+          exec:
+            command: ["mongo", "--eval", "db.adminCommand('ping')"]
+          initialDelaySeconds: 30
+          timeoutSeconds: 5
+        readinessProbe:
+          exec:
+            command: ["mongo", "--eval", "db.adminCommand('ping')"]
+          initialDelaySeconds: 5
+          timeoutSeconds: 1
+      volumes:               
+        - name: mongodb-scripts  
+          configMap:
+           name: mongodb-configmap
+           items:
+            - key: ensure-users.js
+              path: ensure-users.js  
+        - name: mongodb-configmap
+          configMap:
+            name: mongodb-configmap
+            items:
+            - key: mongo.conf
+              path: mongo.conf            
+  volumeClaimTemplates:
+  - metadata:
+      name: mongodb-storage
+      annotations:
+        volume.beta.kubernetes.io/storage-class: "fast"
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: "mongodb-class"
+      resources:
+        requests:
+          storage: 1Gi              
