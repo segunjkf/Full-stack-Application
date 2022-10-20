@@ -1,8 +1,8 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  namespace: db
-  app: mongodb
+  #namespace: db
+  name: mongodb
 spec:
   selector:
     matchLabels:
@@ -14,12 +14,32 @@ spec:
     metadata:
       labels:
         app: mongodb
+        replicaset: rs0.main
     spec:
-      terminationGracePeriodSeconds: 10
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: replicaset
+                  operator: In
+                  values:
+                  - rs0.main
+              topologyKey: kubernetes.io/hostname
+      terminationGracePeriodSeconds: 1
       containers:
       - name: mongodb
-        image: mongo
-        commands: ["numactl","--interleave=all", "mongod", "--wiredTigerCacheSizeGB",  "0.1", "--bind_ip", "0.0.0.0", "--replSet",]
+        image: mongo:4.2
+        command: 
+         - "numactl"
+         - "--interleave=all"
+         -  "mongod"
+         - "--wiredTigerCacheSizeGB" 
+         - "0.1"
+         - "--bind_ip" 
+         - "0.0.0.0"
         ports:
         - containerPort: 27017
           name: web           
@@ -31,26 +51,18 @@ spec:
                 key: mongo-root-password
         resources:
           requests:
-            cpu: 100m
-            memory: 200Mi
-        livenessProbe:
-          exec:
-            command: ["mongo", "--eval", "db.adminCommand('ping')"]
-          initialDelaySeconds: 30
-          timeoutSeconds: 5
-        readinessProbe:
-          exec:
-            command: ["mongo", "--eval", "db.adminCommand('ping')"]
-          initialDelaySeconds: 5
-          timeoutSeconds: 3            
+            cpu: 400m
+            memory: 200Mi 
+        volumeMounts:
+            - name: mongodb-storage
+              mountPath: /data/db 
+
   volumeClaimTemplates:
   - metadata:
       name: mongodb-storage
-      annotations:
-        volume.beta.kubernetes.io/storage-class: "fast"
     spec:
       accessModes: [ "ReadWriteOnce" ]
       storageClassName: "mongodb-class"
       resources:
         requests:
-          storage: 1Gi              
+          storage: 2Gi              
