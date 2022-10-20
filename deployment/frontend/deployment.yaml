@@ -1,10 +1,9 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: api
-  namespace: Api
+  name: frontend
   labels:
-    role: api
+    role: frontend
     env: demo
 spec:
   replicas: 2
@@ -15,29 +14,21 @@ spec:
       maxUnavailable: 25%
   selector:
     matchLabels:
-      role: api
+      role: frontend
   template:
     metadata:
       labels:
-        role: api
+        role: frontend
     spec:
       containers:
-      - name: api
-        image: kaytheog/api
+      - name: frontend
+        image: kaytheog/frontend
         imagePullPolicy: Always
+        env:
+          - name: REACT_APP_APIHOSTPORT
+            value: $API_ELB_PUBLIC_FQDN
         ports:
           - containerPort: 8080
-        env:
-          - name: ME_CONFIG_MONGODB_ADMINUSERNAME
-            valueFrom:
-            secretKeyRef:
-              name: mongodb-secret
-              key: mongo-root-username
-          - name: MONGO_INITDB_ROOT_PASSWORD
-            valueFrom: 
-            secretKeyRef:
-              name: mongodb-secret
-              key: mongo-root-password    
         livenessProbe:
           httpGet:
             path: /ok
@@ -45,7 +36,7 @@ spec:
           initialDelaySeconds: 2
           periodSeconds: 5
         readinessProbe:
-          httpGet:
+          httpGet: 
              path: /ok
              port: 8080
           initialDelaySeconds: 5
