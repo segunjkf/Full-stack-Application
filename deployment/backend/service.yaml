@@ -7,6 +7,6 @@ spec:
     role: api
   ports:
     - protocol: TCP
-      port: 80
-      targetPort: 8080
-  type: LoadBalancer
+      port: 5000
+      targetPort: 5000
+  type: NodePort
