@@ -3,4 +3,6 @@ kind: ConfigMap
 metadata:
   name: mongodb-configmap
 data:
-  database_url: mongo-db-service
+  ports: "5000"
+  client: http://frontend-service
+  MONGODB_URL: mongodb://mongo-db-service:27017/todo-k8s

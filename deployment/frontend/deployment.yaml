@@ -6,7 +6,7 @@ metadata:
     role: frontend
     env: demo
 spec:
-  replicas: 2
+  replicas: 3
   strategy:
     type: RollingUpdate
     rollingUpdate:

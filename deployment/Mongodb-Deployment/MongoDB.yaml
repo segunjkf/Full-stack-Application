@@ -3,7 +3,7 @@ kind: StatefulSet
 metadata:
   #namespace: db
   name: mongodb
-spec:
+spec:    
   selector:
     matchLabels:
       app: mongodb 
@@ -14,7 +14,7 @@ spec:
     metadata:
       labels:
         app: mongodb
-        replicaset: rs0.main
+        replicaset: rs0.main  
     spec:
       affinity:
         podAntiAffinity:
@@ -44,18 +44,38 @@ spec:
         - containerPort: 27017
           name: web           
         env:
+          - name: ME_CONFIG_MONGODB_ADMINUSERNAME
+            valueFrom:
+              secretKeyRef:
+                name: mongodb-secret
+                key: mongo-root-username
+
           - name: MONGO_INITDB_ROOT_PASSWORD
             valueFrom:                            
               secretKeyRef:
                 name: mongodb-secret
                 key: mongo-root-password
+
         resources:
           requests:
             cpu: 400m
             memory: 200Mi 
         volumeMounts:
             - name: mongodb-storage
-              mountPath: /data/db 
+              mountPath: /data/db   
+        livenessProbe:
+          exec:
+            command: ["mongo", "--eval", "db.adminCommand('ping')"]
+          initialDelaySeconds: 2
+          periodSeconds: 5
+        readinessProbe:
+          exec:
+            command: ["mongo", "--eval", "db.adminCommand('ping')"]
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          successThreshold: 1 
+        securityContext:
+          allowPrivilegeEscalation: false       
 
   volumeClaimTemplates:
   - metadata:
