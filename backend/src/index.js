@@ -22,6 +22,7 @@ app.use(cors(corsOptions))
 app.use(cookieParser())
 
 app.use(helmet())
+
 app.use(helmet.contentSecurityPolicy({
     directives: {
         defaultSrc: ["'self'"],

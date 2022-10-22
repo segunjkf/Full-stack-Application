@@ -22,23 +22,22 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: kaytheog/frontend
+        image: kaytheog/frontend:v3
         imagePullPolicy: Always
-        env:
-          - name: REACT_APP_APIHOSTPORT
-            value: $API_ELB_PUBLIC_FQDN
         ports:
-          - containerPort: 8080
+          - containerPort: 80
         livenessProbe:
           httpGet:
-            path: /ok
-            port: 8080
+            path: /
+            port: 80
           initialDelaySeconds: 2
           periodSeconds: 5
         readinessProbe:
           httpGet: 
-             path: /ok
-             port: 8080
+             path: /
+             port: 80
           initialDelaySeconds: 5
           periodSeconds: 5
           successThreshold: 1
+        securityContext:
+          allowPrivilegeEscalation: false  
