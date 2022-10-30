@@ -7,14 +7,7 @@ on:
   
 
 env:
-  
- # AWS_REGION: eu-west-1
- # AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
- # AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  # cat $HOME/.kube/config | base64
-  # create secrets with the base64 encoded values
- # KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
-  #KUBE_NAMESPACE: production
+
   SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
 
@@ -36,7 +29,6 @@ jobs:
       run: docker build -t Kaytheog/backend .
     
     - name: checking  Docker image for vulnerabilities
-      # Snyk can be used to break the build when it detects vulnerabilities.
       continue-on-error: true
       uses: snyk/actions/docker@master
       env:
