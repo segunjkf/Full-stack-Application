@@ -31,10 +31,7 @@ jobs:
         image: kaytheog/backend
         args: --file=Dockerfile
         json: true
-        
-    - name: Checkout the code
-      uses: actions/checkout@v2
-
+      
     - name: Build the image
       working-directory: ./frontend
       run: docker build . -t kaytheog/frontend 
