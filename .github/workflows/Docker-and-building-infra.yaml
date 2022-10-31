@@ -17,13 +17,13 @@ jobs:
     steps:
     - name: Checkout the code
       uses: actions/checkout@v2
-      
+
     - name: Build the image
       working-directory: ./backend
       run: docker build . -t kaytheog/backend
 
     - name: Run Snyk to check image for vulnerabilities
-      continue-on-error: true
+      #continue-on-error: true
       uses: snyk/actions/docker@master
       env:
         SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
@@ -32,13 +32,4 @@ jobs:
         args: --file=Dockerfile
         json: true
 
-    - uses: garethr/snyk-to-sarif@master
-    - uses: actions/upload-artifact@v2
-      with:
-        name: SARIF
-        path: snyk.sarif
 
-    - name: Upload the SARIF file
-      uses: github/codeql-action/upload-sarif@v1
-      with:
-        sarif_file: snyk.sarif
