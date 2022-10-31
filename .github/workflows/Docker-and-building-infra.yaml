@@ -13,7 +13,7 @@ permissions:
 
 jobs:
 
-  Image-scanning:
+  snyk:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -32,10 +32,14 @@ jobs:
         SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
       with:
         image: Kaytheog/backend
-        args: 
-            --file=Dockerfile
-            --severity-threshold=high
-            --output-file=snyk.sarif
+        args: --file=Dockerfile
+        json: true
+        
+    - uses: garethr/snyk-to-sarif@master
+    - uses: actions/upload-artifact@v2
+      with:
+        name: SARIF
+        path: snyk.sarif
 
     - name: Upload result to GitHub Code Scanning
       uses: github/codeql-action/upload-sarif@v2
