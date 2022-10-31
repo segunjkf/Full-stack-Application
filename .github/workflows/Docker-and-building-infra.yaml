@@ -23,7 +23,7 @@ jobs:
       run: docker build . -t kaytheog/backend
 
     - name: Run Snyk to check image for vulnerabilities
-      #continue-on-error: true
+      continue-on-error: true
       uses: snyk/actions/docker@master
       env:
         SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
