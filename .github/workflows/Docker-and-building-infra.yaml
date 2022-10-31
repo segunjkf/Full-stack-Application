@@ -15,12 +15,19 @@ jobs:
 
   Image-scanning:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
     
     steps:
     - uses: actions/checkout@v2
     - name: setting up ...
       working-directory: ./backend
+<<<<<<< HEAD
       run: docker build -t kaytheog/backend  .
+=======
+      run: docker build -t kaytheog/backend .
+>>>>>>> 0d5725889097a6415f4bb25118e214184caf875b
       
     - name: checking  Docker image for vulnerabilities
       continue-on-error: true
@@ -28,10 +35,17 @@ jobs:
       env:
         SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
       with:
+<<<<<<< HEAD
         image: kaytheog/backend
         args: 
            --file=Dockerfile
            --severity-threshold=high
+=======
+        image: Kaytheog/backend
+        args: --file=Dockerfile
+          # --severity-threshold=high
+          # --output-file=snyk.sarif
+>>>>>>> 0d5725889097a6415f4bb25118e214184caf875b
 
     - name: Upload result to GitHub Code Scanning
       uses: github/codeql-action/upload-sarif@v2
