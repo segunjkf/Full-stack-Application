@@ -12,36 +12,30 @@ permissions:
      packages: write
 
 jobs:
-
   snyk:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      security-events: write
-    
     steps:
-    - uses: actions/checkout@v2
-    - name: Setting up ...
-      working-directory: ./backend
-      run: docker build -t kaytheog/backend .
-      
-    - name: checking  Docker image for vulnerabilities
+    - name: Checkout the code
+      uses: actions/checkout@v2
+    - name: Build the image
+      env:
+          DOCKER_BUILDKIT: 1
+      run: docker build . -t you-image 
+    - name: Run Snyk to check image for vulnerabilities
       continue-on-error: true
       uses: snyk/actions/docker@master
       env:
         SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
       with:
-        image: Kaytheog/backend
+        image: your-image
         args: --file=Dockerfile
         json: true
-        
     - uses: garethr/snyk-to-sarif@master
     - uses: actions/upload-artifact@v2
       with:
         name: SARIF
         path: snyk.sarif
-
-    - name: Upload result to GitHub Code Scanning
-      uses: github/codeql-action/upload-sarif@v2
+    - name: Upload the SARIF file
+      uses: github/codeql-action/upload-sarif@v1
       with:
         sarif_file: snyk.sarif
