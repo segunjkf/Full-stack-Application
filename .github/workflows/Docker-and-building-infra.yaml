@@ -4,33 +4,41 @@ on:
   push:
     branches: [ Main ]
 
-env:
+  
 
+env:
   SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
 
 permissions:
      contents: read
      packages: write
 
+
 jobs:
-  snyk:
+
+  Image-scanning:
     runs-on: ubuntu-latest
+    
     steps:
     - uses: actions/checkout@v2
-    - name: Build a Docker image
+    - name: Setting up ...
       working-directory: ./backend
-      run: docker build -t kaytheog/backend .
-    - name: Run Snyk to check Docker image for vulnerabilities
+      run: docker build -t Kaytheog/backend .
+      
+    - name: checking  Docker image for vulnerabilities
+      # Snyk can be used to break the build when it detects vulnerabilities.
       continue-on-error: true
       uses: snyk/actions/docker@master
       env:
-        # More details in https://github.com/snyk/actions#getting-your-snyk-token
-        # or you can signup for free at https://snyk.io/login
         SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
       with:
-        image: kaytheog/backend
-        args: --file=Dockerfile
+        image: Kaytheog/backend
+        args: 
+           --file=Dockerfile
+           --severity-threshold=high
+
     - name: Upload result to GitHub Code Scanning
       uses: github/codeql-action/upload-sarif@v2
       with:
-        sarif_file: snyk.sarif  
+        sarif_file: snyk.sarif
