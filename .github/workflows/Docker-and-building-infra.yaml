@@ -12,7 +12,7 @@ permissions:
      packages: write
 
 jobs:
-  snyk:
+  image-scanning-backend-frontend-infra:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout the code
@@ -28,8 +28,27 @@ jobs:
       env:
         SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
       with:
-        image: your-image
+        image: kaytheog/backend
         args: --file=Dockerfile
         json: true
+        
+    - name: Checkout the code
+      uses: actions/checkout@v2
+
+    - name: Build the image
+      working-directory: ./frontend
+      run: docker build . -t kaytheog/frontend 
+
+    - name: Run Snyk to check image for vulnerabilities
+      continue-on-error: true
+      uses: snyk/actions/docker@master
+      env:
+        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      with:
+        image: kaytheog/frontend
+        args: --file=Dockerfile
+        json: true
+   
+
 
 
