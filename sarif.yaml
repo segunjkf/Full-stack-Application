@@ -1,0 +1,24 @@
+name: "Snyk to SARIF"
+description: "Convert a Snyk JSON file to SARIF format"
+author: "Gareth Rushgrove"
+branding:
+  icon: "alert-triangle"
+  color: "yellow"
+inputs:
+  input:
+    description: "Where to find the Snyk JSON file"
+    default: "snyk.json"
+  file:
+    description: "Location of the related file in the repository"
+  output:
+    description: "Where to save the SARIF file to"
+    default: "snyk.sarif"
+runs:
+  using: "docker"
+  image: "Dockerfile"
+  args:
+  - ${{ inputs.input }}
+  - --file
+  - ${{ inputs.file }}
+  - -o
+  - ${{ inputs.output }}
