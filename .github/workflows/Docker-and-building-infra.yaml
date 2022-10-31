@@ -20,7 +20,7 @@ jobs:
     - uses: actions/checkout@v2
     - name: Setting up ...
       working-directory: ./backend
-      run: docker build -t kaytheog/backend -f Dockerfile .
+      run: docker build -t kaytheog/backend .
       
     - name: checking  Docker image for vulnerabilities
       continue-on-error: true
