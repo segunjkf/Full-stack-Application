@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: api
-  namespace: Api
+ # namespace: Api
   labels:
     role: api
     env: demo
@@ -51,18 +51,21 @@ spec:
           requests:
             cpu: 100m
             memory: 20Mi              
-        livenessProbe:
-          httpGet:
-            path: /
-            port: 5000
-          initialDelaySeconds: 2
-          periodSeconds: 5
-        readinessProbe:
-          httpGet:
-             path: /
-             port: 5000
-          initialDelaySeconds: 5
-          periodSeconds: 5
-          successThreshold: 1
+       # livenessProbe:
+        #  httpGet:
+         #   path: /
+         #   port: 5000
+         # initialDelaySeconds: 2
+         # periodSeconds: 5
+       # readinessProbe:
+        #  httpGet:
+         #    path: /
+          #   port: 5000
+         # initialDelaySeconds: 5
+         # periodSeconds: 5
+         # successThreshold: 1
         securityContext:
           allowPrivilegeEscalation: false  
+
+
+
