@@ -18,6 +18,7 @@ jobs:
     - name: Checkout the code
       uses: actions/checkout@v2
     - name: Build the image
+      working-directory: ./backend
       run: docker build . -t you-image 
     - name: Run Snyk to check image for vulnerabilities
       continue-on-error: true
