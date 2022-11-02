@@ -81,10 +81,4 @@ jobs:
       working-directory: ./Frontend
       run: Docker build kaytheog/backend .
 
-    - name: Build and push Docker image
-      id: build-and-push
-      uses: docker/build-push-action@v3
-      with:
-        context: .
-        push: true
-        tags: kaytheog/frontend
+  
