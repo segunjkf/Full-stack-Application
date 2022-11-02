@@ -57,8 +57,8 @@ jobs:
       uses: actions/checkout@v3
 
     - name: Build Docker image
-      working-directory: ./backend
-      run: docker build kaytheog/backend .
+      working-directory: ./frontend
+      run: docker build -t kaytheog/frontend .
 
     - name: Log into registry ${{ env.REGISTRY }}
       uses: docker/login-action@v2
@@ -74,11 +74,13 @@ jobs:
       with:
         context: .
         push: true
-        tags: kaytheog/backend
+        tags: kaytheog/frontend
      
 
     - name: Build Docker image
       working-directory: ./Frontend
-      run: Docker build kaytheog/backend .
-
+      run: docker build kaytheog/backend .
+    
+    - name: push ./Frontend
+      run: docker push -t kaytheog/frontend
   
