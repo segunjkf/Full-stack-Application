@@ -59,7 +59,8 @@ jobs:
 
 
   Building-and-pushing-to-Docker-hub:
-    needs: image-scanning-backend-frontend-infra
+
+    needs: [image-scanning-backend-frontend-infra, Frontend-images-scaning]
     runs-on: ubuntu-latest
     steps:
     - name: Checkout the code
