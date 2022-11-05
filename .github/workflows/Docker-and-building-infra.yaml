@@ -31,7 +31,12 @@ jobs:
         image: kaytheog/backend
         args: --file=Dockerfile
         json: true
-      
+
+  Frondend-images-scaning:    
+  
+    name: scan Frondend-images-scaning
+    runs-on: ubuntu-latest
+    steps:
     - name: Build the image
       working-directory: ./frontend
       run: docker build . -t kaytheog/frontend 
