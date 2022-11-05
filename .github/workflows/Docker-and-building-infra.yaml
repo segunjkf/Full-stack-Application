@@ -32,13 +32,13 @@ jobs:
         args: --file=Dockerfile
         json: true
 
-  Frondend-images-scaning:    
-  
-    name: scan Frondend-images-scaning
+  Frontend-images-scaning:    
+
+    name: scan Frontend-images-scaning
     runs-on: ubuntu-latest
     steps:
     - name: Build the image
-      working-directory: ./frontend
+      working-directory: /frontend
       run: docker build . -t kaytheog/frontend 
 
     - name: Run Snyk to check image for vulnerabilities
