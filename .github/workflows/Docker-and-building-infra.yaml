@@ -38,7 +38,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Build the image
-      working-directory: /frontend
+      working-directory: ./frontend
       run: docker build . -t kaytheog/frontend 
 
     - name: Run Snyk to check image for vulnerabilities
