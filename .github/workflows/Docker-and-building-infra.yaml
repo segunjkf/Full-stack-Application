@@ -54,9 +54,19 @@ jobs:
         image: kaytheog/frontend
         args: --file=Dockerfile
         json: true
-   
+    
+  IAC-scaning:
+    name: scaning Infra
+    runs-on: ubuntu-latest
 
+    permissions:
+      contents: read
+      packages: write
 
+    steps:
+     - name: Checkout the code
+       uses: actions/checkout@v2
+    
 
   Building-and-pushing-to-Docker-hub:
 
@@ -74,7 +84,7 @@ jobs:
       uses: docker/login-action@v2
       with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       # Build and push Docker image with Buildx (don't push on PR)
       # https://github.com/docker/build-push-action
@@ -88,9 +98,9 @@ jobs:
      
 
     - name: Build Docker image
-      working-directory: ./Frontend
+      working-directory: ./backend
       run: docker build kaytheog/backend .
     
-    - name: push ./Frontend
+    - name: push ./backend
       run: docker push -t kaytheog/frontend
   
