@@ -58,19 +58,15 @@ jobs:
   IAC-scaning:
     name: scaning Infra
     runs-on: ubuntu-latest
-
-    permissions:
-      contents: read
-      packages: write
-
     steps:
+
      - name: Checkout the code
        uses: actions/checkout@v2
     
 
   Building-and-pushing-to-Docker-hub:
 
-    needs: [image-scanning-backend-frontend-infra, Frontend-images-scaning]
+    needs: [image-scanning-backend-frontend-infra]
     runs-on: ubuntu-latest
     steps:
     - name: Checkout the code
@@ -92,9 +88,9 @@ jobs:
       id: build-and-push
       uses: docker/build-push-action@v3
       with:
-        context: .
+        context: ./backend
         push: true
-        tags: kaytheog/frontend
+        tags: kaytheog/backend
      
 
     - name: Build Docker image
@@ -102,5 +98,5 @@ jobs:
       run: docker build kaytheog/backend .
     
     - name: push ./backend
-      run: docker push -t kaytheog/frontend
+      run: docker push -t kaytheog/backend
   
