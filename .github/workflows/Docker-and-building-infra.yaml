@@ -10,6 +10,7 @@ env:
 permissions:
      contents: read
      packages: write
+     security-events: write
 
 jobs:
   image-scanning-backend-frontend-infra:
