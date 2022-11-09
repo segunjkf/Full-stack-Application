@@ -29,6 +29,11 @@ jobs:
         args: --file=Dockerfile
         json: true
 
+    - name: Upload result to GitHub Code Scanning
+      uses: github/codeql-action/upload-sarif@v2
+      with:
+        sarif_file: snyk.sarif    
+
   Frontend-images-scaning:    
 
     name: scan Frontend-images-scaning
