@@ -2,7 +2,7 @@ name: 'Building and testing of Infra and close'
 
 on:
   push:
-    branches: [ Main ]
+    branches: [ main ]
   pull_request:
     branches: [main]  
 
