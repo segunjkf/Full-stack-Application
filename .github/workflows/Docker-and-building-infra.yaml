@@ -1,8 +1,10 @@
 name: 'Building and testing of Infra and close'
 
 on:
-  [push]
-    #branches: [ Main ]
+  push:
+    branches: [ Main ]
+  pull_request:
+    branches: [main]  
 
 env:
   SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
