@@ -18,9 +18,6 @@ jobs:
     - name: Checkout the code
       uses: actions/checkout@v2
 
-    - name: Build the image
-      working-directory: ./backend
-      run: docker build . -t kaytheog/backend
 
     - name: Run Snyk to check image for vulnerabilities
       continue-on-error: true
@@ -41,10 +38,6 @@ jobs:
     - name: Checkout the code
       uses: actions/checkout@v2
     
-    - name: Build the image
-      working-directory: ./frontend
-      run: docker build . -t kaytheog/frontend 
-
     - name: Run Snyk to check image for vulnerabilities
       continue-on-error: true
       uses: snyk/actions/docker@master
