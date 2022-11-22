@@ -35,7 +35,7 @@ jobs:
         args: --file=Dockerfile
         json: true 
 
-  Frontend-images-scaning:    
+  Frontend-images-scanning:    
 
     name: scan Frontend-images-scanning
     runs-on: ubuntu-latest
