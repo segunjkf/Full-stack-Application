@@ -1,10 +1,10 @@
 name: 'Building and testing of Infra and close'
 
-on:
-  push:
-    branches: [ main ]
+on: 
   pull_request:
-    branches: [main]  
+    branches: [main] 
+  workflow_dispatch:   
+  
 
 env:
   SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
@@ -33,12 +33,7 @@ jobs:
       with:
         image: kaytheog/backend
         args: --file=Dockerfile
-        json: true
-
-    - name: Upload result to GitHub Code Scanning
-      uses: github/codeql-action/upload-sarif@v2
-      with:
-        sarif_file: snyk.sarif    
+        json: true 
 
   Frontend-images-scaning:    
 
