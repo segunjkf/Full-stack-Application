@@ -5,16 +5,16 @@ delete_cluster:
 	eksctl delete cluster -f cluster.yaml
 
 describe_cluster:
-	eksctl utils describe-stacks --region=us-east-2 --cluster=robin-personal-cluster
+	eksctl utils describe-stacks --region=us-east-2 --cluster=Full-stack-cluster
 
 aws_identity:
 	aws sts get-caller-identity
 
 set_context:
-	eksctl utils write-kubeconfig --cluster=robin-personal-cluster --set-kubeconfig-context=true
+	eksctl utils write-kubeconfig --cluster=Full-stack-cluster --set-kubeconfig-context=true
 
 enable_iam_sa_provider:
-	eksctl utils associate-iam-oidc-provider --cluster=robin-personal-cluster --approve
+	eksctl utils associate-iam-oidc-provider --cluster=Full-stack-cluster --approve
 
 create_cluster_role:
 	kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/aws-alb-ingress-controller/v1.1.4/docs/examples/rbac-role.yaml
@@ -27,7 +27,7 @@ create_iam_policy:
 
 create_service_account:
 	eksctl create iamserviceaccount \
-      --cluster=robin-personal-cluster \
+      --cluster=Full-stack-cluster \
       --namespace=kube-system \
       --name=aws-load-balancer-controller \
       --attach-policy-arn=arn:aws:iam::617960797257:policy/AWSLoadBalancerControllerIAMPolicy \
