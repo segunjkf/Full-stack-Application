@@ -75,14 +75,6 @@ jobs:
         args: --file=Dockerfile
         json: true
     
-  IAC-scaning:
-    name: scaning Infra
-    runs-on: ubuntu-latest
-    steps:
-
-     - name: Checkout the code
-       uses: actions/checkout@v2
-    
   Building-and-pushing-to-Docker-hub:
 
     needs: [backend-image-scanning, Frontend-images-scanning, linting-dockerfile]
