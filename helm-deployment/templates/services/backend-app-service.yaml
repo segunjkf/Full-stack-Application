@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.service.nodeapp.name }}
+  labels:
+    app: {{ template "nodeapp.name" . }}
+    chart: {{ template "nodeapp.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  ports:
+  - port: {{ .Values.service.nodeapp.externalPort }}
+    targetPort: {{ .Values.service.nodeapp.internalPort }}
+    protocol: {{ .Values.service.nodeapp.protocol }}
+    name: {{ .Values.service.nodeapp.name }}
+  selector:
+    app: {{ template "nodeapp.name" . }}
+    release: {{ .Release.Name }}
+  type: {{ .Values.service.nodeapp.type }}
+  

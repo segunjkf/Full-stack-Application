@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.apps.nodeapp.name }}
+  labels:
+    app: {{ template "nodeapp.name" . }}
+    chart: {{ template "nodeapp.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.apps.nodeapp.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ template "nodeapp.name" . }}
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "nodeapp.name" . }}
+        release: {{ .Release.Name }}
+    spec:
+      containers:
+      - image: {{ .Values.apps.nodeapp.repository }}:{{ .Values.apps.nodeapp.tag }}
+        name: {{ .Chart.Name }}
+        ports:
+        - containerPort: {{ .Values.service.nodeapp.internalPort }}
+        imagePullPolicy: {{ .Values.apps.pullPolicy }}
+        envFrom:
+        - configMapRef:
+            name: {{ .Values.apps.nodeapp.configmap }}
+       

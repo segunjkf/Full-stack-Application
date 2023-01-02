@@ -1,0 +1,45 @@
+# for discovering services and pods
+serviceAccount: discovery-sa
+namespace: default
+
+apps:
+  nodeapp:
+    name: todo-backend-app-deploy
+    repository: kaytheog/api
+    tag: "latest" #"1.0.0"
+    replicaCount: 2
+    configmap: backend-side-configs
+  reactapp:
+    name: todo-frontend-app-deploy
+    repository: kaytheog/frontend:v3
+    tag: "latest" #"1.0.0"
+    replicaCount: 2
+  pullPolicy: Always
+
+database:
+  mongo:
+    serviceName: mongo
+    replicas: 2
+    port: 27017
+configmap:
+  ServerPort: 5000
+  frontendUrl: http://todo-frontend-service
+  MONGODB_URL: mongodb://todo-mongo-service:27017/todo-k8s
+service:
+  reactapp:
+    name: todo-frontend-service
+    type: NodePort
+    protocol: TCP
+    externalPort: 80
+    internalPort: 80
+  nodeapp:
+    name: todo-backend-service
+    type: NodePort
+    protocol: TCP
+    externalPort: 5000
+    internalPort: 5000
+
+resources:
+  staticIp: reactapp
+
+tolerations: []

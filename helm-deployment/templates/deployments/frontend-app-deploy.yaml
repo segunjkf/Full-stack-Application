@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.apps.reactapp.name }}
+  labels:
+    app: {{ template "reactapp.name" . }}
+    chart: {{ template "nodeapp.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.apps.reactapp.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ template "reactapp.name" . }}
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "reactapp.name" . }}
+        release: {{ .Release.Name }}
+    spec:
+      containers:
+      - image: {{ .Values.apps.reactapp.repository }}:{{ .Values.apps.reactapp.tag }}
+        name: {{ .Chart.Name }}
+        ports:
+          - containerPort: {{ .Values.service.reactapp.internalPort }}
+        imagePullPolicy: {{ .Values.apps.pullPolicy }}
+        

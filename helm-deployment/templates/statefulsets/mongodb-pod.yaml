@@ -1,0 +1,96 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongodb
+  labels:
+    app: mongodb
+spec:
+  replicas: {{ .Values.database.mongo.replicas }}
+  selector:
+    matchLabels:
+      app: mongodb
+  minReadySeconds: 10    
+  serviceName: {{ .Values.database.mongo.serviceName }}
+  template:
+    metadata:
+      name: mongodb
+      labels:
+        app: todo-mongodb
+        replicaset: rs0.main
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: replicaset
+                  operator: In
+                  values:
+                  - rs0.main
+              topologyKey: kubernetes.io/hostname
+      terminationGracePeriodSeconds: 1
+      volumes:
+      - name: todo-mongo-vol
+        persistentVolumeClaim:
+          claimName: todo-pvc
+      containers:
+      - image: mongo
+        name: mongo
+        command:
+        - "numactl"
+        - "--interleave=all"
+        - mongod
+        - "--wiredTigerCacheSizeGB"
+        - "0.1"
+        - "--bind_ip"
+        - "0.0.0.0"
+        ports:
+        - containerPort: {{ .Values.database.mongo.port }}
+        env:
+          - name: ME_CONFIG_MONGODB_ADMINUSERNAME
+            valueFrom:
+              secretKeyRef:
+                name: mongodb-secret
+                key: mongo-root-username
+
+          - name: MONGO_INITDB_ROOT_PASSWORD
+            valueFrom:                            
+              secretKeyRef:
+                name: mongodb-secret
+                key: mongo-root-password
+          resources:
+          requests:
+            cpu: 400m
+            memory: 200Mi 
+        volumeMounts:
+            - name: mongodb-storage
+              mountPath: /data/db   
+        livenessProbe:
+          exec:
+            command: ["mongo", "--eval", "db.adminCommand('ping')"]
+          initialDelaySeconds: 2
+          periodSeconds: 5
+        readinessProbe:
+          exec:
+            command: ["mongo", "--eval", "db.adminCommand('ping')"]
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          successThreshold: 1 
+        securityContext:
+          allowPrivilegeEscalation: false   
+
+        volumeMounts:
+        - name: mongodb-storage
+          mountPath: /data/db
+  
+  volumeClaimTemplates:
+  - metadata:
+      name: mongodb-storage
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: "mongodb-class"
+      resources:
+        requests:
+          storage: 2Gi          
