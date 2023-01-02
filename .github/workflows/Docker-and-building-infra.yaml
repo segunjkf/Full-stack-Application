@@ -15,7 +15,25 @@ permissions:
      security-events: write
 
 jobs:
-  image-scanning-backend-frontend-infra:
+  linting-dockerfile:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout the code
+      uses: actions/checkout@v2
+
+    - name: linting Frontend Docker file
+      continue-on-error: true
+      uses: hadolint/hadolint-action@v2.1.0
+      with:
+        dockerfile: ./frontend/Dockerfile  
+
+    - name: linting Frontend Docker file
+      continue-on-error: true
+      uses: hadolint/hadolint-action@v2.1.0
+      with:
+        dockerfile: ./frontend/Dockerfile      
+
+  backend-image-scanning:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout the code
@@ -36,8 +54,7 @@ jobs:
         json: true 
 
   Frontend-images-scanning:    
-
-    name: scan Frontend-images-scanning
+    name: Scanning Frontend-images-scanning
     runs-on: ubuntu-latest
     steps:
 
@@ -66,10 +83,9 @@ jobs:
      - name: Checkout the code
        uses: actions/checkout@v2
     
-
   Building-and-pushing-to-Docker-hub:
 
-    needs: [image-scanning-backend-frontend-infra, Frontend-images-scanning]
+    needs: [backend-image-scanning, Frontend-images-scanning, linting-dockerfile]
     runs-on: ubuntu-latest
     steps:
     - name: Checkout the code
@@ -81,8 +97,6 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # Build and push Docker image with Buildx (don't push on PR)
-      # https://github.com/docker/build-push-action
     - name: Build and push Backend Docker image
       id: build-and-push-backend
       uses: docker/build-push-action@v3
