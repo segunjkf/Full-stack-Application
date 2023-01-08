@@ -1,0 +1,7 @@
+name: 'Infra Scanning'
+
+on: 
+  workflow_dispatch: 
+
+permissions:
+  contents: read 
