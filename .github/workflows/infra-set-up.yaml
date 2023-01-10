@@ -3,6 +3,13 @@ name: 'Deploy infra'
 on: 
   workflow_dispatch:  
 
+env:
+  # aws region
+  AWS_REGION: eu-east-1
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_CLUSTER_NAME: ${{ secrets.AWS_CLUSTER_NAME }}
+
 permissions:
   contents: read
   
@@ -22,7 +29,7 @@ jobs:
       uses: hashicorp/setup-terraform@v1
 
     - name: Terraform Init
-      working-directory: ./eks-cluster
+      working-directory: ./eks-cluster/terraform
       run: terraform init
 
     - name: Terraform Plan
@@ -30,5 +37,64 @@ jobs:
 
     - name: Terraform Apply
       run: terraform apply -auto-approve 
+        
+  build-push:
+
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
       
-   
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ env.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Update KubeConfig
+        shell: bash
+        run: |
+          aws eks update-kubeconfig --name ${{ env.AWS_CLUSTER_NAME }} --region=${{ env.region }}
+
+      - name: Set-up eksctl 
+        shell: bash
+        run: curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp && sudo mv /tmp/eksctl /usr/local/bin
+
+      - name: create service accounts
+        shell: bash
+        run: eksctl create iamserviceaccount \
+             --cluster=full-stack-cluster \
+             --namespace=kube-system \ 
+             --name=aws-load-balancer-controller \
+             --attach-policy-arn=arn:aws:iam::243537103529:policy/AWSLoadBalancerControllerIAMPolicy \
+             --override-existing-serviceaccounts \
+             --approve
+
+      - name: Set-up eksctl 
+        shell: bash
+        run: kubectl apply -k "github.com/aws/eks-charts/stable/aws-load-balancer-controller//crds?ref=master"
+
+      - name: Set-up eksctl 
+        uses: bitovi/github-actions-deploy-eks-helm@v1.1.0
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-west-2
+          cluster-name: ${{ env.AWS_CLUSTER_NAME }}
+          chart-path: eks/aws-load-balancer-controller
+          namespace: kube-system
+          chart-repository: https://aws.github.io/eks-charts
+          name: aws-load-balancer-controller
+
+         
+       
+  
+        
+
+      
