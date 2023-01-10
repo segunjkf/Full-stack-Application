@@ -13,7 +13,7 @@ permissions:
 
 
 jobs:
-  security:
+  security-scanning-kubernetes-manifest:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -26,4 +26,15 @@ jobs:
           file: ./kubernetes-deployment-manifest ./eks-cluster
           args: --severity-threshold=high
 
-          
+  security-scanning-Infra:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run Snyk to check Kubernetes manifest and terraform file for issues
+        continue-on-error: true
+        uses: snyk/actions/iac@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          file: ./eks-cluster/terraform
+          args: --severity-threshold=high
