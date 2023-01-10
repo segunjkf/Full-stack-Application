@@ -13,7 +13,7 @@ resource "aws_eks_node_group" "nodes_general" {
   # Identifiers of EC2 Subnets to associate with the EKS Node Group. 
   # These subnets must have the following resource tag: kubernetes.io/cluster/CLUSTER_NAME 
   # (where CLUSTER_NAME is replaced with the name of the EKS Cluster).
-  subnet_ids = ["{var.private_subnets}", "{var.public_subnets}"]
+  subnet_ids = ["${var.private_subnets[0]}", "${var.private_subnets[1]}"]
 
   # Configuration block with scaling settings
   scaling_config {

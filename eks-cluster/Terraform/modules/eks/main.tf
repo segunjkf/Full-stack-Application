@@ -17,7 +17,7 @@ resource "aws_eks_cluster" "eks" {
     endpoint_public_access = true
 
     # Must be in at least two different availability zones
-    subnet_ids = ["{var.private_subnets}", "{var.public_subnets}"]
+    subnet_ids = ["${var.private_subnets[0]}", "${var.private_subnets[1]}", "${var.public_subnets[0]}", "${var.public_subnets[1]}"]
   }
 
   # Ensure that IAM Role permissions are created before and deleted after EKS Cluster handling.
