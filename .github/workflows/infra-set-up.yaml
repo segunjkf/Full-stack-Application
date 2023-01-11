@@ -17,7 +17,7 @@ permissions:
   contents: read
   
 jobs:
-  terraform:
+  Infra-set-up:
     name: 'Terraform'
     runs-on: ubuntu-latest
     env:
@@ -41,9 +41,10 @@ jobs:
     - name: Terraform Apply
       run: terraform apply -auto-approve 
         
-  controller-set-up:
+  controller-and-argocd-set-up:
 
     runs-on: ubuntu-latest
+    needs: Infra-set-up
     permissions:
       contents: read
       packages: write
@@ -55,21 +56,21 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          aws-access-key-id: ${{ env.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Set-up eksctl 
         shell: bash
         run: eksctl utils associate-iam-oidc-provider \
-             --region ${{ env.AWS_REGION }} \
-             --cluster ${{ env.AWS_CLUSTER_NAME }} \
+             --region ${{ secrets.AWS_REGION }} \
+             --cluster ${{ secrets.AWS_CLUSTER_NAME }} \
              --approve    
 
       - name: Update KubeConfig
         shell: bash
         run: |
-          aws eks update-kubeconfig --name ${{ env.AWS_CLUSTER_NAME }} --region=${{ env.AWS_REGION }}
+          aws eks update-kubeconfig --name ${{ secrets.AWS_CLUSTER_NAME }} --region=${{ secrets.AWS_REGION }}
 
       - name: Set-up eksctl 
         shell: bash
@@ -81,7 +82,7 @@ jobs:
              --cluster=full-stack-cluster \
              --namespace=kube-system \ 
              --name=aws-load-balancer-controller \
-             --attach-policy-arn=arn:aws:iam::${{ env.AWS_ACCOUNT_NUMBER }}:policy/AWSLoadBalancerControllerIAMPolicy \
+             --attach-policy-arn=arn:aws:iam::${{ secrets.AWS_ACCOUNT_NUMBER }}:policy/AWSLoadBalancerControllerIAMPolicy \
              --override-existing-serviceaccounts \
              --approve
 
@@ -106,7 +107,7 @@ jobs:
 
       - name: Install the helm chart if using IAM roles for service accounts
         shell: bash
-        run: helm install aws-load-balancer-controller eks/aws-load-balancer-controller -n kube-system --set clusterName=${{ env.AWS_CLUSTER_NAME }} --set serviceAccount.create=false --set serviceAccount.name=aws-load-balancer-controller  
+        run: helm install aws-load-balancer-controller eks/aws-load-balancer-controller -n kube-system --set clusterName=${{ secrets.AWS_CLUSTER_NAME }} --set serviceAccount.create=false --set serviceAccount.name=aws-load-balancer-controller  
       
       - name: Install the helm chart if using IAM roles for service accounts
         shell: bash
@@ -114,7 +115,7 @@ jobs:
 
       - name: Install the TargetGroupBinding CRDs if upgrading the chart via helm upgrade
         shell: bash
-        run: helm upgrade --install argocd https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml --set server.password="${{ env.ARGOCD_PASSWORD }}" -n argocd
+        run: helm upgrade --install argocd https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml --set server.password="${{ secrets.ARGOCD_PASSWORD }}" -n argocd
 
       - name: Install the helm chart if using IAM roles for service accounts
         working-directory: ./argocd
