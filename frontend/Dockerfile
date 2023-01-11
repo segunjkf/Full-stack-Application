@@ -15,7 +15,7 @@ ENV REACT_APP_baseAPIURL = http://backend-service:5000
 
 RUN yarn build
 
-FROM nginx:latest
+FROM nginx:1.23.2
 
 LABEL maintainer=Aamir-Pinger
 
