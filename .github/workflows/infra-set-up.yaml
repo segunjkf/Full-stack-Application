@@ -59,10 +59,17 @@ jobs:
           aws-secret-access-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
+      - name: Set-up eksctl 
+        shell: bash
+        run: eksctl utils associate-iam-oidc-provider \
+             --region ${{ env.AWS_REGION }} \
+             --cluster ${{ env.AWS_CLUSTER_NAME }} \
+             --approve    
+
       - name: Update KubeConfig
         shell: bash
         run: |
-          aws eks update-kubeconfig --name ${{ env.AWS_CLUSTER_NAME }} --region=${{ env.region }}
+          aws eks update-kubeconfig --name ${{ env.AWS_CLUSTER_NAME }} --region=${{ env.AWS_REGION }}
 
       - name: Set-up eksctl 
         shell: bash
