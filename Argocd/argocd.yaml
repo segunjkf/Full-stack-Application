@@ -7,9 +7,9 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/segunjkf/Argocd-demo # Remote Github repository where ArgoCD should pull configurations from. Please replace this with the Url of the Repository you forked.
+    repoURL: https://github.com/segunjkf/Full-stack-Application/blob/main/kubernetes-deployment-manifest/Ingress/argocdingress.yaml # Remote Github repository where ArgoCD should pull configurations from. Please replace this with the Url of the Repository you forked.
     targetRevision: HEAD # The last commit in the remote repository.
-    path: "demo-de" # Track and sync the dev path in the repository.
+    path: "argocd-demo" # Track and sync the dev path in the repository.
 
   destination:
     server: https://kubernetes.default.svc # Address of the Kubernetes cluster.
