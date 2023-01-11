@@ -1,7 +1,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: todo-app
+  name: Argocd
   annotations:
     kubernetes.io/ingress.class: alb
     alb.ingress.kubernetes.io/scheme: internet-facing
@@ -12,14 +12,14 @@ metadata:
     alb.ingress.kubernetes.io/group.name: full-stack-ingress
 spec:
   rules:
-    - host: www.kaytheog.com
+    - host: argocd.kaytheog.com
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: todo-frontend-service
+                name: argocd-declear-service
                 port:
                   number: 80
 

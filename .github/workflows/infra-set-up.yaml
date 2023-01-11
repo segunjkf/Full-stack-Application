@@ -9,6 +9,9 @@ env:
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   AWS_CLUSTER_NAME: ${{ secrets.AWS_CLUSTER_NAME }}
+  AWS_ACCOUNT_NUMBER: ${{ secrets.AWS_ACCOUNT_NUMBER }}
+  ARGOCD_PASSWORD: ${{ secrets.ARGOCD_PASSWORD }}
+
 
 permissions:
   contents: read
@@ -38,7 +41,7 @@ jobs:
     - name: Terraform Apply
       run: terraform apply -auto-approve 
         
-  build-push:
+  controller-set-up:
 
     runs-on: ubuntu-latest
     permissions:
@@ -49,7 +52,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
       
-
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -72,7 +74,7 @@ jobs:
              --cluster=full-stack-cluster \
              --namespace=kube-system \ 
              --name=aws-load-balancer-controller \
-             --attach-policy-arn=arn:aws:iam::243537103529:policy/AWSLoadBalancerControllerIAMPolicy \
+             --attach-policy-arn=arn:aws:iam::${{ env.AWS_ACCOUNT_NUMBER }}:policy/AWSLoadBalancerControllerIAMPolicy \
              --override-existing-serviceaccounts \
              --approve
 
@@ -80,21 +82,43 @@ jobs:
         shell: bash
         run: kubectl apply -k "github.com/aws/eks-charts/stable/aws-load-balancer-controller//crds?ref=master"
 
-      - name: Set-up eksctl 
-        uses: bitovi/github-actions-deploy-eks-helm@v1.1.0
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-west-2
-          cluster-name: ${{ env.AWS_CLUSTER_NAME }}
-          chart-path: eks/aws-load-balancer-controller
-          namespace: kube-system
-          chart-repository: https://aws.github.io/eks-charts
-          name: aws-load-balancer-controller
+      - name: Set-up helm
+        uses: azure/setup-helm@v3
 
+      - name: Adding aws load-balancer controller helm
+        shell: bash
+        run: helm repo add eks https://aws.github.io/eks-charts  
+
+      - name: set-up aws load-balancer controller 
+        shell: bash
+        run: helm repo add eks https://aws.github.io/eks-charts  && helm update repo
+
+      - name: Install the TargetGroupBinding CRDs if upgrading the chart via helm upgrade
+        shell: bash
+        run: kubectl apply -k "github.com/aws/eks-charts/stable/aws-load-balancer-controller//crds?ref=master"
+
+      - name: Install the helm chart if using IAM roles for service accounts
+        shell: bash
+        run: helm install aws-load-balancer-controller eks/aws-load-balancer-controller -n kube-system --set clusterName=${{ env.AWS_CLUSTER_NAME }} --set serviceAccount.create=false --set serviceAccount.name=aws-load-balancer-controller  
+
+      - name: Install the TargetGroupBinding CRDs if upgrading the chart via helm upgrade
+        shell: bash
+        run: helm upgrade --install argocd https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml --set server.password="${{ env.ARGOCD_PASSWORD }}"
+
+
+
+
+
+
+
+         
+      
          
        
   
         
+ 
+
+
 
       

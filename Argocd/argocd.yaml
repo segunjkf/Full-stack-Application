@@ -1,0 +1,24 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: declarative-app # Name of the application.
+  namespace: argocd # The namespace where the application should be created.
+
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/segunjkf/Argocd-demo # Remote Github repository where ArgoCD should pull configurations from. Please replace this with the Url of the Repository you forked.
+    targetRevision: HEAD # The last commit in the remote repository.
+    path: "demo-de" # Track and sync the dev path in the repository.
+
+  destination:
+    server: https://kubernetes.default.svc # Address of the Kubernetes cluster.
+    namespace: declarative-app  # Indicates that ArgoCD should apply the configurations from the git repository to the declarative-app namespace.
+
+  syncPolicy:
+    syncOptions:
+    - CreateNamespace=true  # Create the declarative-app namespace if it doesn't exist.
+
+    automated:
+      selfHeal: true  # Automatically sync changes from the Git repository.
+      prune: true # ArgoCD will delete this application if the configuration settings are deleted from Git.
