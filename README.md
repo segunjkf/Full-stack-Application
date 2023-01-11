@@ -18,6 +18,8 @@ This project simulates the deployment of a Full-Stack MERN application to a Kube
 
 - Infra-scanning
     - snyk
+- Kubernetes scanning
+     - snyk       
 
 
 ## Continuous Deployment 
