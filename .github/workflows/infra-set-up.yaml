@@ -115,15 +115,15 @@ jobs:
 
       - name: Install the TargetGroupBinding CRDs if upgrading the chart via helm upgrade
         shell: bash
-        run: helm upgrade --install argocd https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml --set server.password="${{ secrets.ARGOCD_PASSWORD }}" -n argocd
+        run: helm repo add argo https://argoproj.github.io/argo-helm && helm repo update 
+      - name: installing helm repo
+        shell: bash 
+        run: helm install argocd argo/argo-cd --set server.password="${{ secrets.ARGOCD_PASSWORD }}" -n argocd  --atomic 
 
       - name: Install the helm chart if using IAM roles for service accounts
         working-directory: ./argocd
         shell: bash
         run:  kubectl apply -f argocd.yaml
-
-        
-  
 
 
 
