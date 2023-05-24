@@ -4,18 +4,21 @@
   "private": true,
   "dependencies": {
     "axios": "^0.27.2",
-    "mdbreact": "^4.19.2",
+    "mdbreact": "^5.1.0",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
     "react-loader-spinner": "^3.1.4",
-    "react-scripts": "3.1.1",
-    "validator": "^11.1.0"
+    "react-scripts": "5.0.0",
+    "validator": "^13.7.0",
+    "@snyk/protect": "latest"
   },
   "scripts": {
     "start": "export SET NODE_OPTIONS=--openssl-legacy-provider && react-scripts start",
     "build": "export SET NODE_OPTIONS=--openssl-legacy-provider && react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "prepare": "yarn run snyk-protect",
+    "snyk-protect": "snyk-protect"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -31,5 +34,6 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  }
+  },
+  "snyk": true
 }
